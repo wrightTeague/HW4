@@ -1,5 +1,5 @@
 all:
-	g++ -Wall -g -O0 Sim.cpp Sim_Math.cpp TimeCode.cpp TimeCodeTests.cpp BigInteger.cpp -o traffic-simulation -lsqlite3 -I/usr/include
+	g++ -Wall -g -O3 Sim.cpp Sim_Math.cpp TimeCode.cpp TimeCodeTests.cpp BigInteger.cpp -o traffic-simulation -lsqlite3 -I/usr/include
 
 
 tests: Tests.cpp Sim_Math.cpp TimeCode.cpp TimeCodeTests.cpp BigInteger.cpp BigIntegerTests.cpp 
