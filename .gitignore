@@ -1,0 +1,11 @@
+# assignment handouts (not part of the submission)
+assignment_4_description.pdf
+rubric.pdf
+
+# build outputs
+traffic-simulation
+tests
+*.dSYM/
+plot.html
+*.txt
+original_plot.html
