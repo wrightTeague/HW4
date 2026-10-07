@@ -254,8 +254,6 @@ int main(int argc, char* argv[]) {
 		int progress = percentage(t.GetTimeCodeAsSeconds(), dur.GetTimeCodeAsSeconds());
 		std::cout << "\r" << progress << "%" << std::flush;
 
-		ALL();
-
 		// --- New Cars Show Up (maybe) ---
 		int num_new_cars = poisson(new_car_rate);
 		if(num_cars >= CAP){
