@@ -1,5 +1,6 @@
 /* Sim.cpp */
 // Author: Programmer Intern Jordan (with help from my teammates! :P)
+// Speedups by Teague Wright, with help from Claude (AI) on finding the slow spots and C++ references
 
 #include <iostream> // cout and stuff
 #include <algorithm> // 
@@ -249,11 +250,13 @@ int main(int argc, char* argv[]) {
 	int curProgress = 0;
 	for(TimeCode t = TimeCode(); t < dur; t = t + TimeCode(0, 0, 1)){
 		int progress = percentage(t.GetTimeCodeAsSeconds(), dur.GetTimeCodeAsSeconds());
+		// only print when the percentage changes; flushing every second was ~600k writes
 		if (progress > curProgress) {
 			std::cout << "\r" << progress << "%" << std::flush;
 			curProgress = progress;
 		}
 
+		// the TimeCode test suite used to run here every simulated second; tests belong in ./tests
 		//ALL();
 
 		// --- New Cars Show Up (maybe) ---
@@ -317,6 +320,8 @@ int main(int argc, char* argv[]) {
 		}
 		data_point_pair cur = data[i];
 		if(count_times.find(cur.num_cars) != count_times.end()){
+			// reference, not a copy: copying the whole vector out and back in every pass
+			// made this loop slower as the vectors grew
 			std::vector<TimeCode>& times_list = count_times[cur.num_cars];
 			times_list.push_back(cur.t);
 		} else {
