@@ -233,26 +233,28 @@ int main(int argc, char* argv[]) {
 	const double new_car_rate = 4; // average new cars per second
 	const double p_car_exits = 0.298; // probability a car departs when road is empty
 
-	time_t Tstart = time(0);
 	std::cout << "Computing crash probabilities from database..." << std::endl;
 	// Build the crash probability table
 	const std::unordered_map<std::string, double> crash_prob_map = build_crash_prob_map();
 	for(const auto& pair : crash_prob_map){
 		std::cout << "Day: " << pair.first << ", probability of a crash: " << pair.second << std::endl;
 	}
-	time_t Tend = time(0);
-	std::cout << "First loop time: " << (Tend - Tstart) << " seconds" << std::endl;
 
-	Tstart = time(0);
 	std::cout << "Simulating traffic..." << std::endl;
 	BigInteger total_num_cars = BigInteger("0"); // number of cars that traveled, use BigInteger in case of integer overflow
 	std::vector<data_point_pair> data; // to store the data points
 	int num_cars = 0; // number of cars (intially 0)
 	int crash_count = 0;
 	int crash_timer = 0; // cool-off period of a crash
+	int curProgress = 0;
 	for(TimeCode t = TimeCode(); t < dur; t = t + TimeCode(0, 0, 1)){
 		int progress = percentage(t.GetTimeCodeAsSeconds(), dur.GetTimeCodeAsSeconds());
-		std::cout << "\r" << progress << "%" << std::flush;
+		if (progress > curProgress) {
+			std::cout << "\r" << progress << "%" << std::flush;
+			curProgress = progress;
+		}
+
+		//ALL();
 
 		// --- New Cars Show Up (maybe) ---
 		int num_new_cars = poisson(new_car_rate);
@@ -299,18 +301,20 @@ int main(int argc, char* argv[]) {
 		data.push_back({t, num_cars});
 		//cout << "Time: " << t.ToString() << "s   Num Cars: " << num_cars << endl;
 	}
-	Tend = time(0);
-	std::cout << "Second loop time: " << (Tend - Tstart) << " seconds" << std::endl;
 	std::cout << std::endl;
 
 
 	// Find the times at which certain amount of cars are present
-	Tstart = time(0);
 	std::cout << "Computing sample statistics..." << std::endl;
 	std::unordered_map<int, std::vector<TimeCode>> count_times;
+	curProgress = 0;
 	for(size_t i = 0; i < data.size(); i++){
 		int progress = percentage(i, data.size());
-		std::cout << "\r" << progress << "%" << std::flush;
+		// only print when the percentage changes; flushing every pass was ~600k writes
+		if(progress > curProgress){
+			std::cout << "\r" << progress << "%" << std::flush;
+			curProgress = progress;
+		}
 		data_point_pair cur = data[i];
 		if(count_times.find(cur.num_cars) != count_times.end()){
 			std::vector<TimeCode>& times_list = count_times[cur.num_cars];
@@ -319,8 +323,6 @@ int main(int argc, char* argv[]) {
 			count_times[cur.num_cars] = std::vector<TimeCode>{cur.t};
 		}
 	}
-	Tend = time(0);
-	std::cout << "Third loop time: " << (Tend - Tstart) << " seconds" << std::endl;
 	std::cout << "\n---Simulation Finished---" << std::endl;
 
 
