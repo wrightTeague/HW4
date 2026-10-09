@@ -351,7 +351,6 @@ int main(int argc, char* argv[]) {
 	res.x_data = x_data;
 	res.y_data = y_data;
 	res.plotted_duration = TimeCode(0, 0, DURATION_10MIN);
-	res.plotted_duration.WasteTimeAndBeSlow();
 
 
 	generateTerminalOutput(res);
