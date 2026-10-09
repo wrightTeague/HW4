@@ -11,12 +11,14 @@
 #include "Sim_Math.h"
 
 
-double power_recursive(double a, int b){
-	if(b == 1){
-		return a;
+// Loop instead of recursion (boss's request). It multiplies in the same order the
+// recursive version did, a * (a * (... * a)), so the doubles come out bit-for-bit identical.
+double power_loop(double a, int b){
+	double ans = a;
+	for(int i = 1; i < b; i++){
+		ans = a * ans;
 	}
-	double tmp = a * power_recursive(a, b-1);
-	return tmp;
+	return ans;
 }
 
 double power(double a, int b){
@@ -36,7 +38,7 @@ double power(double a, int b){
 		b = -b;
 	}
 	
-	double ans = power_recursive(a, b);
+	double ans = power_loop(a, b);
 
 	if(needs_inversion){
 		ans = 1.0 / ans;
